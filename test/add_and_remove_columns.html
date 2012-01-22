@@ -23,6 +23,11 @@
 				evt.stop();
 				expandableColumns.popColumn();
 			});
+			var writePositions = function(){
+				$('column_positions').innerHTML = expandableColumns.getColumnBands().toString();
+			}
+			expandableColumns.addEvent('dragEnd', writePositions);
+			expandableColumns.addEvent('drag', writePositions);
 		})
 	</script>
 
@@ -31,6 +36,8 @@
 <body>
 	<div class="content">
 		<h1>Resizable Columns Demo</h1>
+		<div id="column_positions"></div>
+		<br/><br/>
 		<div id="columns" class="slider">
 			<div style="background: red"></div>
 			<div style="background: blue"></div>

@@ -7,6 +7,7 @@ var ExpandableColumns = new Class({
 		columnClass: 'column',
 		resizeHandleClass: 'resize',
 		minColumnWidth: 20,
+		totalTicks: 100,
 		snap: false
 		
 	},
@@ -14,8 +15,8 @@ var ExpandableColumns = new Class({
 		this.container = $(container);
 		this.setOptions(options);
 		this.isContainerFull = false;
-		this.options.height = this.options.height || this.container.getSize().y + 'px';
-		this.options.width = this.options.width || this.container.getSize().x + 'px';
+		this.options.height = (this.options.height || this.container.getSize().y) + 'px';
+		this.options.width = (this.options.width || this.container.getSize().x) + 'px';
 		this.container.setStyles({
 			position: 'relative', 
 			width: this.options.width, 
@@ -25,6 +26,13 @@ var ExpandableColumns = new Class({
 		this.initializedColumns = [];
 		this.columns.each(function(column, i){ this.$initColumn(column, i) }, this);
 		this.columns.each(function(column, i){ this.$setupDragHandle(column, i) }, this);
+	},
+	getColumnBands: function(){
+		var bands = [this.options.totalTicks]; 
+		var columnTicks = this.columns.map(function(column){
+			return Math.round(this.options.totalTicks * Number.from(column.getStyle('right')) / Number.from(this.options.width));
+		}, this);
+		return bands.concat(columnTicks);
 	},
 	appendColumn: function(column){
 		column = $(column).inject(this.container);
@@ -81,15 +89,17 @@ var ExpandableColumns = new Class({
 					var expandableColspan = colSize.totalWidth + leftColumn.getComputedSize().totalWidth;
 					var paddingAndBorder = colSize.totalWidth - colSize.width;
 					this.maxDragWidth = expandableColspan - this.options.minColumnWidth - paddingAndBorder;
-					
+					this.fireEvent('dragStart');
 				}.bind(this),
 				onDrag: function() {
 					if(column.getWidth() > this.maxDragWidth) {
 						column.setStyle("width", this.maxDragWidth);
 					}
 					this.$stretchToMatch(leftColumn, column);
+					this.fireEvent('drag');
 				}.bind(this),
-				onComplete: this.fireEvent.bind(this, 'dragEnd')
+				onComplete: this.fireEvent.bind(this, 'dragEnd'),
+				onCancel: this.fireEvent.bind(this, 'dragEnd')
 			});
 		}
 	},
