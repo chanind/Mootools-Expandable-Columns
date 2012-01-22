@@ -26,6 +26,28 @@ var ExpandableColumns = new Class({
 		this.columns.each(function(column, i){ this.$initColumn(column, i) }, this);
 		this.columns.each(function(column, i){ this.$setupDragHandle(column, i) }, this);
 	},
+	appendColumn: function(column){
+		column = $(column).inject(this.container);
+		this.columns.push(column);
+		this.$initColumn(column);
+		this.$setupDragHandle(column);
+		this.$equalizeFinalColumns();
+	},
+	popColumn: function(){
+		if (this.columns.length > 1){
+			var lastCol = this.columns.getLast();
+			var lastColWidth = lastCol.getComputedSize().totalWidth;
+			this.columns.erase(lastCol);
+			this.initializedColumns.erase(lastCol);
+			lastCol.destroy();
+			var newLastCol = this.columns.getLast();
+			var newLastColWidth = newLastCol.getComputedSize().width;
+			newLastCol.setStyles({
+				width: newLastColWidth + lastColWidth + 'px',
+				right: 0
+			});
+		}
+	},
 	$initColumn: function(column, i){
 		if (i == null) i = this.columns.length - 1;
 		var width = (this.options.initialWidths[i] || Math.ceil(this.$containerWidth() / this.columns.length)) + 'px';
@@ -106,6 +128,16 @@ var ExpandableColumns = new Class({
 		leftColumn.setStyles({
 			right: rightColLeftEdge + 'px',
 			width: newLeftColWidth + 'px'
+		});
+	},
+	$equalizeFinalColumns: function(){
+		var lastCols = this.columns.slice(this.columns.length - 2);
+		var totalWidth = lastCols.map(function(col){ return col.getComputedSize().width }).sum();
+		var equalizedWidth = Math.ceil(totalWidth / 2);
+		lastCols[1].setStyle('width', equalizedWidth + 'px');
+		lastCols[0].setStyles({
+			width: totalWidth - equalizedWidth + 'px',
+			right: lastCols[1].getComputedSize().totalWidth + 'px'
 		});
 	},
 	$containerWidth: function(){
