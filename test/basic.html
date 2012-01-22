@@ -10,7 +10,9 @@
 	<script src="../source/expandable_columns.js" type="text/javascript"></script>
 	<script type="text/javascript">
 		window.addEvent('domready', function(){
-			var expandableColumns = new ExpandableColumns('columns');
+			var expandableColumns = new ExpandableColumns('columns',{
+				minColumnWidth: 150
+			});
 		})
 	</script>
 
@@ -35,7 +37,6 @@
 				<p>
 					Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
 				</p>
-				<div class="resize"></div>
 			</div>
 			<div>
 				<div class="col_title">
